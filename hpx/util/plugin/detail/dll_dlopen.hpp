@@ -323,22 +323,7 @@ namespace hpx { namespace util { namespace plugin {
             using boost::filesystem::path;
             std::string result;
 
-#if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__)
-            char directory[PATH_MAX] = { '\0' };
-            const_cast<dll&>(*this).LoadLibrary(ec);
-            if (!ec && ::dlinfo(dll_handle, RTLD_DI_ORIGIN, directory) < 0) {
-                std::ostringstream str;
-                str << "Hpx.Plugin: Could not extract path the shared "
-                       "library '" << dll_name << "' has been loaded from "
-                       "(dlerror: " << dlerror() << ")";
-
-                HPX_THROWS_IF(ec, filesystem_error,
-                    "plugin::get_directory",
-                    str.str());
-            }
-            result = directory;
-            ::dlerror();                // Clear the error state.
-#elif defined(__APPLE__)
+#if defined(__APPLE__)
             // SO staticfloat's solution
             const_cast<dll&>(*this).LoadLibrary(ec);
             if (ec)
@@ -364,6 +349,21 @@ namespace hpx { namespace util { namespace plugin {
                     }
                 }
             }
+            ::dlerror();                // Clear the error state.
+#elif defined(RTLD_DI_ORIGIN)
+            char directory[PATH_MAX] = { '\0' };
+            const_cast<dll&>(*this).LoadLibrary(ec);
+            if (!ec && ::dlinfo(dll_handle, RTLD_DI_ORIGIN, directory) < 0) {
+                std::ostringstream str;
+                str << "Hpx.Plugin: Could not extract path the shared "
+                       "library '" << dll_name << "' has been loaded from "
+                       "(dlerror: " << dlerror() << ")";
+
+                HPX_THROWS_IF(ec, filesystem_error,
+                    "plugin::get_directory",
+                    str.str());
+            }
+            result = directory;
             ::dlerror();                // Clear the error state.
 #endif
             if (&ec != &throws)
