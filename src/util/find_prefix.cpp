@@ -137,9 +137,13 @@ namespace hpx { namespace util
         }
         r = exe_path;
 
-#elif defined(__linux) || defined(linux) || defined(__linux__)
+#elif defined(__linux) || defined(linux) || defined(__linux__) || defined(__NetBSD__)
         char buf[PATH_MAX + 1];
+#if defined(__linux) || defined(linux) || defined(__linux__)
         ssize_t length = ::readlink("/proc/self/exe", buf, sizeof(buf));
+#elif defined(__NetBSD__)
+        ssize_t length = ::readlink("/proc/curproc/exe", buf, sizeof(buf));
+#endif
 
         if (length != -1)
         {
