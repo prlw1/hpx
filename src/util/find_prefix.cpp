@@ -18,6 +18,8 @@
 #  include <sys/stat.h>
 #  include <linux/limits.h>
 #  include <vector>
+#elif __NetBSD__
+#  include <sys/stat.h>
 #elif __APPLE__
 #  include <mach-o/dyld.h>
 #elif defined(__FreeBSD__)
