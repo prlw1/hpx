@@ -57,14 +57,12 @@
 #include <stdexcept>
 #endif
 
-#if defined(__FreeBSD__)
-#include <sys/param.h>
+#ifndef EXEC_PAGESIZE
+#if defined(_SC_PAGESIZE)
+#define EXEC_PAGESIZE static_cast<std::size_t>(sysconf(_SC_PAGESIZE))
+#elif defined (PAGE_SIZE)
 #define EXEC_PAGESIZE PAGE_SIZE
 #endif
-
-#if defined(__APPLE__)
-#include <unistd.h>
-#define EXEC_PAGESIZE static_cast<std::size_t>(sysconf(_SC_PAGESIZE))
 #endif
 
 /**
@@ -83,13 +81,17 @@ namespace posix
         void* real_stack = ::mmap(nullptr,
             size + EXEC_PAGESIZE,
             PROT_EXEC | PROT_READ | PROT_WRITE,
-#if defined(__APPLE__)
-            MAP_PRIVATE | MAP_ANON | MAP_NORESERVE,
-#elif defined(__FreeBSD__)
-            MAP_PRIVATE | MAP_ANON,
-#else
-            MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE,
+            MAP_PRIVATE
+#ifdef MAP_ANON
+            | MAP_ANON
 #endif
+#ifdef MAP_ANONYMOUS
+            | MAP_ANONYMOUS
+#endif
+#ifdef MAP_NORESERVE
+            | MAP_NORESERVE
+#endif
+            ,
             -1,
             0
             );
