@@ -70,7 +70,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(__linux) || defined(linux) || defined(__linux__)\
-         || defined(__FreeBSD__) || defined(__APPLE__)
+         || defined(__FreeBSD__) || defined(__APPLE__) || defined(__NetBSD__)
 namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
     namespace posix
