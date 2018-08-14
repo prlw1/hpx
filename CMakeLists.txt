@@ -1246,7 +1246,8 @@ if(NOT WIN32)
     hpx_libraries(supc++)
   endif()
 
-  if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+  find_library(DL_LIBRARY NAMES dl)
+  if(DL_LIBRARY)
     hpx_libraries(dl)
   endif()
 
